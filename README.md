@@ -85,3 +85,4 @@ adaptive/
 | `num_train_epochs` | `trainning_classifier.py` | `20` | Number of fine-tuning epochs |
 | `learning_rate` | `trainning_classifier.py` | `3e-5` | AdamW learning rate |
 | `k` (top-k) | `labelling.py` | `50` | Number of BM25 candidates to re-rank |
+| `DOWNSAMPLE` | `trainning_classifier.py` | `True` | Balance classes by downsampling to minority class size. Set `False` to use all data |

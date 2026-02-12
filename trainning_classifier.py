@@ -19,7 +19,7 @@ from datasets import Dataset
 
 # ============================================================
 # 1. Load labeled data
-#    Reads all CSV files produced by bge-label.py from the
+#    Reads all CSV files produced by labelling.py from the
 #    labeled_queries/ directory and keeps only query + class.
 # ============================================================
 DATA_DIR = Path("labeled_queries")
@@ -28,25 +28,30 @@ dataset = pd.concat((pd.read_csv(f) for f in DATA_DIR.glob("*.csv")), ignore_ind
 df = dataset[["query", "class"]].copy()
 
 # ============================================================
-# 2. Downsample to balance classes
-#    Each class is sampled down to the size of the minority
-#    class so the model doesn't overfit to the majority.
+# 2. (Optional) Downsample to balance classes
+#    Set DOWNSAMPLE = True to sample each class down to the
+#    minority class size. Set False to use all data as-is.
 # ============================================================
+DOWNSAMPLE = True
+
 class_counts = df["class"].value_counts()
-min_count = class_counts.min()
 print(class_counts)
-print("Downsampling to", min_count, "examples per class")
 
-dfs = []
-for cls, group in df.groupby("class"):
-    downsampled = group.sample(n=min_count, replace=False, random_state=42)
-    dfs.append(downsampled)
-
-df_balanced = (
-    pd.concat(dfs, ignore_index=True)
-      .sample(frac=1, random_state=42)
-      .reset_index(drop=True)
-)
+if DOWNSAMPLE:
+    min_count = class_counts.min()
+    print("Downsampling to", min_count, "examples per class")
+    dfs = []
+    for cls, group in df.groupby("class"):
+        downsampled = group.sample(n=min_count, replace=False, random_state=42)
+        dfs.append(downsampled)
+    df_balanced = (
+        pd.concat(dfs, ignore_index=True)
+          .sample(frac=1, random_state=42)
+          .reset_index(drop=True)
+    )
+else:
+    print("Using all data without downsampling")
+    df_balanced = df.sample(frac=1, random_state=42).reset_index(drop=True)
 
 queries = df_balanced["query"].astype(str).values
 y       = df_balanced["class"].values
