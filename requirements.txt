@@ -1,0 +1,14 @@
+torch
+transformers
+datasets
+evaluate
+sentence-transformers
+FlagEmbedding
+ir-datasets
+pandas
+numpy
+scipy
+scikit-learn
+matplotlib
+nltk
+tqdm
